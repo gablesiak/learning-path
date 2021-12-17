@@ -42,4 +42,4 @@ create stage azure_stage
     url='azure://<username>.blob.core.windows.net/container'
     file_format = csv_format;
     
-    list @azure_stage;
+list @azure_stage;
