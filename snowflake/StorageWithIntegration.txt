@@ -43,3 +43,9 @@ create stage azure_stage
     file_format = csv_format;
     
 list @azure_stage;
+
+use role accountadmin;
+
+drop integration if exists azure_integration;
+drop file format if exists csv_format;
+drop stage if exists azure_stage;

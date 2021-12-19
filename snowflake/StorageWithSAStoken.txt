@@ -22,7 +22,11 @@ create or replace file format csv_format
 
 CREATE OR REPLACE STAGE azure_stage_sas
   URL='azure://<username>.blob.core.windows.net/container'
-  CREDENTIALS=(AZURE_SAS_TOKEN='?sastoken')
+  CREDENTIALS=(AZURE_SAS_TOKEN='?<sastoken>')
   FILE_FORMAT = csv_format;
           
 list @azure_stage_sas;
+
+
+drop file format if exists csv_format;
+drop stage if exists azure_stage_sas;
