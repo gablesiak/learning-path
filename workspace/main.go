@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"strings"
+
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -28,7 +30,9 @@ type outputUserData struct {
 }
 
 func OpenFile() []byte {
-	inputByte, err := ioutil.ReadFile("input.json")
+	inputFile := "input.json"
+
+	inputByte, err := ioutil.ReadFile(inputFile)
 
 	if err != nil {
 		fmt.Print(err)
@@ -43,15 +47,17 @@ func CreateInputStruct() inputUserData {
 
 	inputStruct := inputUserData{}
 
-	_ = json.Unmarshal([]byte(inputByte), &inputStruct)
+	err := json.Unmarshal([]byte(inputByte), &inputStruct)
+
+	if err != nil {
+		fmt.Print(err)
+		os.Exit(1)
+	}
 
 	return inputStruct
 }
 
-func ValidateData() {
-
-	inputStruct := CreateInputStruct()
-
+func ValidateData(inputStruct inputUserData) {
 	validateInput := validator.New()
 
 	err := validateInput.Struct(inputStruct)
@@ -59,41 +65,45 @@ func ValidateData() {
 	if err != nil || strings.Count(inputStruct.Organization, "/") != 3 {
 		fmt.Println(err.Error())
 		os.Exit(1)
-	} else {
-		fmt.Println("Validation done, no issues found")
 	}
 }
 
-func TransformData() outputUserData {
+func TransformData(inputStruct inputUserData) outputUserData {
+	splitedInput, department, subdepartment, team := splitOrganizationString(inputStruct)
 
-	inputStruct := CreateInputStruct()
+	return outputUserData{
+		FullName:      inputStruct.FirstName + " " + inputStruct.LastName,
+		Age:           inputStruct.Age,
+		City:          inputStruct.City,
+		Organization:  splitedInput,
+		Department:    department,
+		Subdepartment: subdepartment,
+		Team:          team,
+	}
+}
 
-	ValidateData()
-
-	outputStruct := outputUserData{}
-
+func splitOrganizationString(inputStruct inputUserData) (string, string, string, string) {
 	splitedInput := strings.Split(inputStruct.Organization, "/")
-
-	outputStruct.FullName = inputStruct.FirstName + " " + inputStruct.LastName
-	outputStruct.Age = inputStruct.Age
-	outputStruct.City = inputStruct.City
-	outputStruct.Organization = splitedInput[0]
-	outputStruct.Department = splitedInput[1]
-	outputStruct.Subdepartment = splitedInput[2]
-	outputStruct.Team = splitedInput[3]
-
-	return outputStruct
+	return splitedInput[0], splitedInput[1], splitedInput[2], splitedInput[3]
 }
 
 func GenerateOutput(outputData outputUserData) {
-	outputFile, _ := json.MarshalIndent(outputData, "", " ")
+	outputFile, err := json.MarshalIndent(outputData, "", " ")
 
-	_ = ioutil.WriteFile("output.json", outputFile, 0644)
+	if err != nil {
+		fmt.Print(err)
+		os.Exit(1)
+	}
+
+	//bit flags for output file - Owner: read & write Group: read Other: read
+	var fileMode fs.FileMode = 0644
+	_ = ioutil.WriteFile("output.json", outputFile, fileMode)
 }
 
 func main() {
 
-	userData := TransformData()
-
-	GenerateOutput(userData)
+	inputUserData := CreateInputStruct()
+	ValidateData(inputUserData)
+	outputUserData := TransformData(inputUserData)
+	GenerateOutput(outputUserData)
 }
