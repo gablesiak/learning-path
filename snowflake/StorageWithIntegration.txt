@@ -1,0 +1,51 @@
+-- creating database and warehouse --
+
+use role sysadmin;
+
+create database if not exists playdb;
+
+create warehouse if not exists playwh with warehouse_size='xsmall' auto_suspend=1 initially_suspended=true;
+
+use schema playdb.public;
+
+-- cloud storage integration --
+
+use role accountadmin;
+
+create storage integration azure_integration
+      type = external_stage
+      storage_provider = azure
+      enabled = true
+      azure_tenant_id = '<tenant_id>'
+      storage_allowed_locations = ('*');
+      
+grant usage on integration azure_integration to sysadmin;
+
+
+describe storage integration azure_integration;
+
+
+use role sysadmin;
+
+
+create or replace file format csv_format
+      type = csv
+      field_delimiter = '|'
+      skip_header = 1
+      null_if = ('NULL', 'null')
+      empty_field_as_null = true
+      compression = gzip;
+
+
+create stage azure_stage
+    storage_integration = azure_integration
+    url='azure://<username>.blob.core.windows.net/container'
+    file_format = csv_format;
+    
+list @azure_stage;
+
+use role accountadmin;
+
+drop integration if exists azure_integration;
+drop file format if exists csv_format;
+drop stage if exists azure_stage;
