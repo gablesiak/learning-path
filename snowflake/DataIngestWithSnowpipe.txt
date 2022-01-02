@@ -1,0 +1,46 @@
+-- Create database --
+
+create database TEST_DB;
+
+create table "TEST_DB"."PUBLIC"."MYTABLE" ("LOANNUM" NUMBER (38,0), "BRANCHNAME" VARCHAR(50), "AMOUNT" NUMBER(20,2));
+
+use role accountadmin;
+
+-- Create integration --
+
+create notification integration snowpipe_event_integration
+    ENABLED=TRUE
+    TYPE=QUEUE
+    NOTIFICATION_PROVIDER=AZURE_STORAGE_QUEUE
+    AZURE_STORAGE_QUEUE_PRIMARY_URI='https://<storageaccount>.queue.core.windows.net/snowdata-queue'
+    AZURE_TENANT_ID='<tenant_id>';
+    
+desc notification integration snowpipe_event_integration;
+ 
+-- Create stage -- 
+
+create or replace stage azure_stage
+  URL='azure://<storageaccount>.blob.core.windows.net/snowdata-blob'
+  CREDENTIALS=(AZURE_SAS_TOKEN='?<sastoken>');
+  
+-- Create snowpipe -- 
+ 
+create pipe TEST_DB.PUBLIC.MYSNOWPIPE
+    AUTO_INGEST=TRUE
+    INTEGRATION=snowpipe_event_integration
+    AS
+    COPY INTO TEST_DB.PUBLIC.MYTABLE
+    FROM @TEST_DB.azure_stage
+    FILE_FORMAT=(TYPE='CSV');
+    
+ select SYSTEM$PIPE_STATUS('TEST_DB.PUBLIC.MYSNOWPIPE');
+ 
+-- Show results --
+ 
+ select * FROM TEST_DB.PUBLIC.MYTABLE;
+
+-- Drop objects --
+
+drop notification integration if exists snowpipe_event_integration;
+drop stage if exists azure_stage;
+drop pipe if exists TEST_DB.PUBLIC.MYSNOWPIPE;
