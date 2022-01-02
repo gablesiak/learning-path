@@ -96,6 +96,7 @@ func GenerateOutput(outputData outputUserData) {
 	}
 
 	//bit flags for output file - Owner: read & write Group: read Other: read
+	// https://pkg.go.dev/io/fs#FileMode
 	var fileMode fs.FileMode = 0644
 	_ = ioutil.WriteFile("output.json", outputFile, fileMode)
 }
