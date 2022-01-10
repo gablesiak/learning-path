@@ -1,8 +1,26 @@
+[
 {
-    "FirstName": "Jan",
+    "FirstName": "Jann",
     "LastName": "Kowalski",
     "Age": 28,
     "City": "Krakow",
     "Organization": "Relativity/Engineering/Cloud Engineering/Watchmen"
 
+},
+{
+    "FirstName": "Anna",
+    "LastName": "Nowak",
+    "Age": 30,
+    "City": "Krakow",
+    "Organization": "Relativity/IT/Operations/EMEA"
+
+},
+{
+    "FirstName": "John",
+    "LastName": "Smith",
+    "Age": 50,
+    "City": "Chicago",
+    "Organization": "Relativity/IT/Automation/US"
+
 }
+]

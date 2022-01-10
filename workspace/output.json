@@ -1,9 +1,29 @@
-{
- "FullName": "Jan Kowalski",
- "Age": 28,
- "City": "Krakow",
- "Organization": "Relativity",
- "Department": "Engineering",
- "Subdepartment": "Cloud Engineering",
- "Team": "Watchmen"
-}
+[
+ {
+  "FullName": "Jann Kowalski",
+  "Age": 28,
+  "City": "Krakow",
+  "Organization": "Relativity",
+  "Department": "Engineering",
+  "Subdepartment": "Cloud Engineering",
+  "Team": "Watchmen"
+ },
+ {
+  "FullName": "Anna Nowak",
+  "Age": 30,
+  "City": "Krakow",
+  "Organization": "Relativity",
+  "Department": "IT",
+  "Subdepartment": "Operations",
+  "Team": "EMEA"
+ },
+ {
+  "FullName": "John Smith",
+  "Age": 50,
+  "City": "Chicago",
+  "Organization": "Relativity",
+  "Department": "IT",
+  "Subdepartment": "Automation",
+  "Team": "US"
+ }
+]
