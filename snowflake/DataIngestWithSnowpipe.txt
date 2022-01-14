@@ -1,33 +1,34 @@
 -- Select Database -- 
 
 use database TEST_DB;
+use schema PUBLIC;
 
 --Create integration --
 
 create notification integration snowpipe_event_integration
-    ENABLED=TRUE
-    TYPE=QUEUE
-    NOTIFICATION_PROVIDER=AZURE_STORAGE_QUEUE
-    AZURE_STORAGE_QUEUE_PRIMARY_URI='https://<storage-account>.queue.core.windows.net/<queue>' 
-    AZURE_TENANT_ID='<tenant-id>';
+    enabled=TRUE
+    type=QUEUE
+    notification_provider=AZURE_STORAGE_QUEUE
+    azure_storage_queue_primary_uri='https://<storage-account>.queue.core.windows.net/<queue>' 
+    azure_tenant_id='<tenant-id>';
     
 desc notification integration snowpipe_event_integration;
  
 -- Create stage -- 
 
 create or replace stage azure_stage
-  URL='azure://<storage-account>.blob.core.windows.net/<blob>'
-  CREDENTIALS=(AZURE_SAS_TOKEN='<sas-token>');
+  url='azure://<storage-account>.blob.core.windows.net/<blob>'
+  credentials=(AZURE_SAS_TOKEN='<sas-token>');
   
 -- Create snowpipe -- 
  
 create pipe TEST_DB.PUBLIC.testsnowpipe
-    AUTO_INGEST=TRUE
-    INTEGRATION=snowpipe_event_integration
+    auto_ingest=TRUE
+    integration=snowpipe_event_integration
     as
     copy into TEST_TABLE_SNOWPIPE
     from @TEST_DB.PUBLIC.azure_stage
-    FILE_FORMAT=(TYPE='CSV');
+    file_format=(TYPE='CSV');
     
  select SYSTEM$PIPE_STATUS(TEST_DB.PUBLIC.testsnowpipe);
  
