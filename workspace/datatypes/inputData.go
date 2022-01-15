@@ -6,4 +6,5 @@ type InputUserData struct {
 	Age          int    `validate:"required,gte=18,lte=80"`
 	City         string `validate:"required"`
 	Organization string `validate:"required,contains=/"`
+	
 }

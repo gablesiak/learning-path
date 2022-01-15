@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/gablesiak/services"
@@ -20,15 +20,14 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			log.Printf("Write failed: %v", err)
+			fmt.Printf("Write failed: %v", err)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(statusCheckJson)
 
 	case http.MethodPost:
-
-		newInput, err := services.ValidateInput(r)
+		newInput, err := services.ValidateInputStructure(r)
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)

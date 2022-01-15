@@ -7,25 +7,28 @@ import (
 	"net/http"
 	"regexp"
 
-
 	"github.com/gablesiak/datatypes"
 	"gopkg.in/go-playground/validator.v9"
 )
 
-func ValidateData(inputStruct datatypes.InputUserData) {
+func validateData(inputStruct datatypes.InputUserData) {
 	validateInput := validator.New()
 
 	err := validateInput.Struct(inputStruct)
 
-	validateOrganization, _ := regexp.MatchString("[^A-Za-z/A-Za-z/A-Za-z/A-Za-z]", inputStruct.Organization)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
-	if err != nil || !validateOrganization {
+	validateOrganization, err := regexp.MatchString("[^A-Za-z/A-Za-z/A-Za-z/A-Za-z]", inputStruct.Organization)
+
+	if err != nil || !validateOrganization{
 		fmt.Println(err.Error())
 	}
 }
 
 
-func ValidateInput(r *http.Request) (datatypes.InputUserData, error){
+func ValidateInputStructure(r *http.Request) (datatypes.InputUserData, error){
 	var newUser datatypes.InputUserData
 	outputByte, err := ioutil.ReadAll(r.Body)
 	if err != nil {

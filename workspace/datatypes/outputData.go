@@ -8,4 +8,5 @@ type OutputUserData struct {
 	Department    string
 	Subdepartment string
 	Team          string
+	
 }

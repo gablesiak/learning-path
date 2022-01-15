@@ -6,7 +6,7 @@ import (
 	"github.com/gablesiak/datatypes"
 )
 
-func TransformData(inputStruct datatypes.InputUserData) datatypes.OutputUserData {
+func transformData(inputStruct datatypes.InputUserData) datatypes.OutputUserData {
 	splitedInput, department, subdepartment, team := splitOrganizationString(inputStruct)
 
 	return datatypes.OutputUserData{
@@ -17,6 +17,7 @@ func TransformData(inputStruct datatypes.InputUserData) datatypes.OutputUserData
 		Department:    department,
 		Subdepartment: subdepartment,
 		Team:          team,
+		
 	}
 }
 
