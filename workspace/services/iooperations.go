@@ -28,6 +28,10 @@ func generateOutput(outputData datatypes.OutputUserData){
 		fmt.Print(err)
 		os.Exit(1)
 	}
-	_,_ = outputFile.Write(multipleOutputData)
+	_, err = outputFile.Write(multipleOutputData)
+	if err != nil {
+		fmt.Print(err)
+		os.Exit(1)
+	}
 }
 
