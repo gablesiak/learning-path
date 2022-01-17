@@ -1,0 +1,24 @@
+-- Select resources --
+
+use role accountadmin;
+
+use SNOWFLAKE;
+
+use schema SNOWFLAKE.ACCOUNT_USAGE;
+
+-- Monitoring warehouse credits --
+
+select WAREHOUSE_NAME, CREDITS_USED
+from 
+table(information_schema.WAREHOUSE_METERING_HISTORY(
+  date_range_start=>dateadd('day',-14,current_date()), 
+  date_range_end=>current_date()));
+  
+
+-- Monitoring pipe credits --
+
+select PIPE_NAME, CREDITS_USED
+from 
+table(information_schema.PIPE_USAGE_HISTORY(
+  date_range_start=>dateadd('day',-14,current_date()), 
+  date_range_end=>current_date()));

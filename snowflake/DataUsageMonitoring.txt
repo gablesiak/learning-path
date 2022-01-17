@@ -1,0 +1,58 @@
+-- Select resources --
+use role accountadmin;
+
+use SNOWFLAKE;
+
+-- Monitoring warehouses --
+
+select *
+from 
+table(information_schema.WAREHOUSE_LOAD_HISTORY(
+  date_range_start=>dateadd('day',-14,current_date()), 
+  date_range_end=>current_date(), 
+  warehouse_name=>'COMPUTE_WH'));
+
+-- Monitoring queries --
+
+select *
+from
+table(information_schema.QUERY_HISTORY(
+       end_time_range_start => dateadd('day',-1,current_timestamp()),
+       end_time_range_end => current_timestamp(),
+       result_limit => 100));
+
+select *
+from
+table(information_schema.QUERY_HISTORY_BY_USER(
+       user_name => 'gablesiak',
+       result_limit => 100));
+       
+select *
+from
+table(information_schema.QUERY_HISTORY_BY_WAREHOUSE(
+       warehouse_name => 'PLAYWH',
+       result_limit => 100));
+  
+  
+-- Monitoring stages  --
+select *
+from 
+table(information_schema.STAGE_STORAGE_USAGE_HISTORY(
+  date_range_start=>dateadd('day',-14,current_date()), 
+  date_range_end=>current_date()));
+  
+  
+-- Monitoring data ingesting  --
+
+select *
+from 
+table(information_schema.PIPE_USAGE_HISTORY(
+  date_range_start=>dateadd('day',-14,current_date()), 
+  date_range_end=>current_date()));
+  
+select *
+from 
+table(information_schema.COPY_HISTORY(
+  table_name=>'TEST_DB.PUBLIC.TEST_TABLE_BULKCOPY', 
+  start_time=>dateadd(days,-14, current_timestamp())));
+  
