@@ -3,17 +3,7 @@
 use database TEST_DB;
 use schema PUBLIC;
 
--- Create stage -- 
-
-create or replace stage azure_copy
-  url='azure://<storage-account>.blob.core.windows.net/<blob>'
-  credentials=(AZURE_SAS_TOKEN='<sas-token>');
-  -- Select database -- 
-
-use database TEST_DB;
-use schema PUBLIC;
-
--- Create stage -- 
+-- Create stage --
 
 create or replace stage azure_copy
   url='azure://<storage-account>.blob.core.windows.net/<blob>'
@@ -22,6 +12,7 @@ create or replace stage azure_copy
 list @azure_copy;
 
 -- Create task -- 
+
 create or replace task copy_data
 warehouse=PLAYWH
 schedule='1 MINUTE'
@@ -33,35 +24,11 @@ fileformat=(TYPE='CSV')
 alter task copy_data resume;
 
  -- Show results --
- 
+
 select * from TEST_TABLE_BULKCOPY;
 
 
  -- Drop objects --
- 
-drop stage if exists azure_stage;
-drop task if exists copy_data;
-drop table if exists TEST_TABLE_BULKCOPY;
-list @azure_copy;
-
--- Create task -- 
-create or replace task copy_data
-warehouse=PLAYWH
-schedule='1 MINUTE'
-as
-copy into TEST_TABLE_BULKCOPY from @azure_copy
-fileformat=(TYPE='CSV')
-;
- 
-alter task copy_data resume;
-
- -- Show results --
- 
-select * from TEST_TABLE_BULKCOPY;
-
-
- -- Drop objects --
- 
 drop stage if exists azure_stage;
 drop task if exists copy_data;
 drop table if exists TEST_TABLE_BULKCOPY;
