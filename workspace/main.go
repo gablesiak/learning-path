@@ -27,7 +27,7 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(statusCheckJson)
 
 	case http.MethodPost:
-		newInput, err := services.ValidateInputStructure(r)
+		newInput, err := services.ValidateRequestBody(r)
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)

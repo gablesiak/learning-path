@@ -11,7 +11,7 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-func validateData(inputStruct datatypes.InputUserData) {
+func validateInputStruct(inputStruct datatypes.InputUserData) {
 	validateInput := validator.New()
 
 	err := validateInput.Struct(inputStruct)
@@ -28,7 +28,7 @@ func validateData(inputStruct datatypes.InputUserData) {
 }
 
 
-func ValidateInputStructure(r *http.Request) (datatypes.InputUserData, error){
+func ValidateRequestBody(r *http.Request) (datatypes.InputUserData, error){
 	var newUser datatypes.InputUserData
 	outputByte, err := ioutil.ReadAll(r.Body)
 	if err != nil {

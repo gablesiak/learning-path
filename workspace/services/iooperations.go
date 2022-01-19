@@ -11,7 +11,7 @@ import (
 
 
 func SaveUser(newUser datatypes.InputUserData){
-	validateData(newUser)
+	validateInputStruct(newUser)
 	userEntry := transformData(newUser)
 	generateOutput(userEntry)
 }
