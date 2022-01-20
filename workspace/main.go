@@ -3,108 +3,45 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/fs"
-	"io/ioutil"
-	"os"
-	"strings"
+	"net/http"
 
-	"gopkg.in/go-playground/validator.v9"
+	"github.com/gablesiak/services"
 )
 
-type inputUserData struct {
-	FirstName    string `validate:"required"`
-	LastName     string `validate:"required"`
-	Age          int    `validate:"required,gte=18,lte=80"`
-	City         string `validate:"required"`
-	Organization string `validate:"required,contains=/"`
+type status struct {
+	Confirmation string
 }
 
-type outputUserData struct {
-	FullName      string
-	Age           int
-	City          string
-	Organization  string
-	Department    string
-	Subdepartment string
-	Team          string
-}
+func usersHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		statusCheck := status{Confirmation: "positive"}
+		statusCheckJson, err := json.Marshal(statusCheck)
 
-func OpenFile() []byte {
-	inputFile := "input.json"
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Printf("Write failed: %v", err)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(statusCheckJson)
 
-	inputByte, err := ioutil.ReadFile(inputFile)
+	case http.MethodPost:
+		newInput, err := services.ValidateRequestBody(r)
 
-	if err != nil {
-		fmt.Print(err)
-		os.Exit(1)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		services.SaveUser(newInput)
+		w.WriteHeader(http.StatusCreated)
+		return
+
 	}
-
-	return inputByte
-}
-
-func CreateInputStruct() inputUserData {
-	inputByte := OpenFile()
-
-	inputStruct := inputUserData{}
-
-	err := json.Unmarshal([]byte(inputByte), &inputStruct)
-
-	if err != nil {
-		fmt.Print(err)
-		os.Exit(1)
-	}
-
-	return inputStruct
-}
-
-func ValidateData(inputStruct inputUserData) {
-	validateInput := validator.New()
-
-	err := validateInput.Struct(inputStruct)
-
-	if err != nil || strings.Count(inputStruct.Organization, "/") != 3 {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-}
-
-func TransformData(inputStruct inputUserData) outputUserData {
-	splitedInput, department, subdepartment, team := splitOrganizationString(inputStruct)
-
-	return outputUserData{
-		FullName:      inputStruct.FirstName + " " + inputStruct.LastName,
-		Age:           inputStruct.Age,
-		City:          inputStruct.City,
-		Organization:  splitedInput,
-		Department:    department,
-		Subdepartment: subdepartment,
-		Team:          team,
-	}
-}
-
-func splitOrganizationString(inputStruct inputUserData) (string, string, string, string) {
-	splitedInput := strings.Split(inputStruct.Organization, "/")
-	return splitedInput[0], splitedInput[1], splitedInput[2], splitedInput[3]
-}
-
-func GenerateOutput(outputData outputUserData) {
-	outputFile, err := json.MarshalIndent(outputData, "", " ")
-
-	if err != nil {
-		fmt.Print(err)
-		os.Exit(1)
-	}
-
-	//bit flags for output file - Owner: read & write Group: read Other: read
-	// https://pkg.go.dev/io/fs#FileMode
-	var fileMode fs.FileMode = 0644
-	_ = ioutil.WriteFile("output.json", outputFile, fileMode)
 }
 
 func main() {
-
-	inputUserData := CreateInputStruct()
-	ValidateData(inputUserData)
-	outputUserData := TransformData(inputUserData)
-	GenerateOutput(outputUserData)
+	http.HandleFunc("/users", usersHandler)
+	http.ListenAndServe(":5000", nil)
 }
