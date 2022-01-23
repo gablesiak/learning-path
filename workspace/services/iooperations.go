@@ -6,24 +6,24 @@ import (
 	"os"
 
 	"github.com/gablesiak/datatypes"
-	"github.com/google/uuid"
+	//"github.com/google/uuid"
 )
 
-
-func SaveUser(newUser datatypes.InputUserData){
+func SaveUser(newUser datatypes.InputUserData) {
 	validateInputStruct(newUser)
 	userEntry := transformData(newUser)
 	generateOutput(userEntry)
 }
 
-func generateOutput(outputData datatypes.OutputUserData){
-	multipleOutputData, err :=json.MarshalIndent(outputData, "", " ")
+func generateOutput(outputData datatypes.OutputUserData) {
+	multipleOutputData, err := json.MarshalIndent(outputData, "", " ")
 	if err != nil {
 		fmt.Print(err)
 	}
-	
-	uuidString := uuid.NewString()
-	outputFile, err := os.Create("./output/" + uuidString + ".json")
+
+	//WIP - FILE CREATION
+	//uuidString := uuid.NewString()
+	outputFile, err := os.Create("./output/output.json")
 	if err != nil {
 		fmt.Print(err)
 		os.Exit(1)
@@ -34,4 +34,3 @@ func generateOutput(outputData datatypes.OutputUserData){
 		os.Exit(1)
 	}
 }
-

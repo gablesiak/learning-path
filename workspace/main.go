@@ -38,6 +38,17 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusCreated)
 		return
 
+	case http.MethodPut:
+		newInput, err := services.ValidateRequestBody(r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		azureAccess := services.SetStorageAccess()
+		services.SaveUser(newInput)
+		services.UploadFile(azureAccess)
+		return
 	}
 }
 
