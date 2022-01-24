@@ -86,7 +86,3 @@ func UploadFile(stcr StorageAccess, inputData datatypes.InputUserData) {
 		fmt.Print(err)
 	}
 }
-
-func GenerateOutputStruct(inputData datatypes.InputUserData) {
-	panic("unimplemented")
-}
