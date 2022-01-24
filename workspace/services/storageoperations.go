@@ -2,12 +2,14 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"os"
 
 	"github.com/Azure/azure-pipeline-go/pipeline"
 	"github.com/Azure/azure-storage-blob-go/azblob"
+	"github.com/gablesiak/datatypes"
 	"github.com/google/uuid"
 )
 
@@ -63,27 +65,23 @@ func CreateContainerName() string {
 	return containerName
 }
 
-func UploadFile(stcr StorageAccess) {
-	//WIP - FILE CREATION
-	fileName := "./output/output.json"
+func UploadFile(stcr StorageAccess, inputData datatypes.InputUserData) {
+	uuidString := uuid.NewString()
 	containerName := CreateContainerName()
 	containerURL := GetContainerURL(stcr, containerName)
+	outputData := GenerateOutputStruct(inputData)
+
+	multipleOutputData, err := json.MarshalIndent(outputData, "", " ")
 
 	ctx := context.Background()
-	_, err := containerURL.Create(ctx, azblob.Metadata{}, azblob.PublicAccessNone)
-
+	_, err = containerURL.Create(ctx, azblob.Metadata{}, azblob.PublicAccessNone)
 	if err != nil {
 		fmt.Print(err)
 	}
 
-	blobURL := containerURL.NewBlockBlobURL(fileName)
+	blobURL := containerURL.NewBlockBlobURL(uuidString + ".json")
 
-	file, err := os.Open(fileName)
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	_, err = azblob.UploadFileToBlockBlob(ctx, file, blobURL, azblob.UploadToBlockBlobOptions{})
+	_, err = azblob.UploadBufferToBlockBlob(ctx, multipleOutputData, blobURL, azblob.UploadToBlockBlobOptions{})
 	if err != nil {
 		fmt.Print(err)
 	}

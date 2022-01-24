@@ -46,8 +46,7 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		azureAccess := services.SetStorageAccess()
-		services.SaveUser(newInput)
-		services.UploadFile(azureAccess)
+		services.UploadFile(azureAccess, newInput)
 		return
 	}
 }
