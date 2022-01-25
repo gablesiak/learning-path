@@ -65,13 +65,16 @@ func CreateContainerName() string {
 	return containerName
 }
 
-func UploadFile(stcr StorageAccess, inputData datatypes.InputUserData) {
+func UploadFile(azureAccess StorageAccess, inputData datatypes.InputUserData) {
 	uuidString := uuid.NewString()
 	containerName := CreateContainerName()
-	containerURL := GetContainerURL(stcr, containerName)
+	containerURL := GetContainerURL(azureAccess, containerName)
 	outputData := GenerateOutputStruct(inputData)
 
 	multipleOutputData, err := json.MarshalIndent(outputData, "", " ")
+	if err != nil {
+		fmt.Print(err)
+	}
 
 	ctx := context.Background()
 	_, err = containerURL.Create(ctx, azblob.Metadata{}, azblob.PublicAccessNone)
