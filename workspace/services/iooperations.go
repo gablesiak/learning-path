@@ -9,20 +9,13 @@ import (
 	"github.com/google/uuid"
 )
 
-func SaveUser(newUser datatypes.InputUserData) {
-	validateInputStruct(newUser)
-	userEntry := transformData(newUser)
-	generateOutput(userEntry)
+func GenerateLocalOutput(newUser datatypes.InputUserData) {
+	userEntry := GenerateOutputStruct(newUser)
+	generateLocalFile(userEntry)
 }
 
-func GenerateOutputStruct(newUser datatypes.InputUserData) datatypes.OutputUserData {
-	validateInputStruct(newUser)
-	userEntry := transformData(newUser)
 
-	return userEntry
-}
-
-func generateOutput(outputData datatypes.OutputUserData) {
+func generateLocalFile(outputData datatypes.OutputUserData) {
 	multipleOutputData, err := json.MarshalIndent(outputData, "", " ")
 	if err != nil {
 		fmt.Print(err)

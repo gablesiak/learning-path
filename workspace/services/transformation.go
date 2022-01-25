@@ -25,3 +25,10 @@ func splitOrganizationString(inputStruct datatypes.InputUserData) (string, strin
 	splitedInput := strings.Split(inputStruct.Organization, "/")
 	return splitedInput[0], splitedInput[1], splitedInput[2], splitedInput[3]
 }
+
+func GenerateOutputStruct(newUser datatypes.InputUserData) datatypes.OutputUserData {
+	validateInputStruct(newUser)
+	userEntry := transformData(newUser)
+
+	return userEntry
+}
