@@ -1,0 +1,123 @@
+-- SELECT DATABASE --
+use database BLOB_DB;
+
+use schema PUBLIC;
+
+use role accountadmin;
+
+-- Create stage --
+
+create or replace stage azure_stage_sas
+  URL='azure://<storage_account>.blob.core.windows.net/<container>'
+  CREDENTIALS=(AZURE_SAS_TOKEN='?<sas-token>');
+
+list @azure_stage_sas;
+
+-- Import raw data to table --
+
+create or replace table RAW_SOURCE (
+  SRC VARIANT);
+
+create or replace task copy_data
+warehouse=PLAYWH
+schedule='1 MINUTE'
+AS
+copy into RAW_SOURCE from @azure_stage_sas
+FILE_FORMAT=(TYPE=json);
+
+alter task copy_data resume;
+
+-- Create source table with hash--
+
+create or replace table RAW_SOURCE_HASHED as select * from RAW_SOURCE;
+
+alter table RAW_SOURCE_HASHED
+add v_sha varchar;
+
+update RAW_SOURCE_HASHED SET
+v_sha=SHA2(SRC);
+
+-- Insert data to table with hash --
+
+create or replace task merge_sources
+warehouse=PLAYWH
+schedule='1 MINUTE'
+AS
+merge into RAW_SOURCE_HASHED using RAW_SOURCE
+on RAW_SOURCE_HASHED.SRC=RAW_SOURCE.SRC
+when matched then update set RAW_SOURCE_HASHED.SRC=RAW_SOURCE.SRC
+when not matched then insert (SRC) values (RAW_SOURCE.SRC);
+
+alter task merge_sources resume;
+
+create or replace task generate_sha
+warehouse=PLAYWH
+schedule='1 MINUTE'
+AS
+update RAW_SOURCE_HASHED SET
+v_sha=SHA2(SRC)
+;
+
+alter task generate_sha resume;
+
+-- Create users table --
+
+create or replace table USERS_TRANSFORMED as
+select
+V_SHA as ID,
+src:FullName::string    as FullName,
+src:Age::number     as Age,
+src:City::string    as City,
+src:Organization::string    as Organization,
+src:Department::string  as Department,
+src:Subdepartment::string as Subdepartment,
+src:Team::string as Team
+from RAW_SOURCE_HASHED;
+
+-- Insert transformed json data to user table --
+
+create or replace task insert_data
+warehouse=PLAYWH
+schedule='1 MINUTE'
+AS
+insert into USERS_TRANSFORMED
+select
+V_SHA,
+src:FullName::string,
+src:Age::number,
+src:City::string,
+src:Organization::string,
+src:Department::string,
+src:Subdepartment::string,
+src:Team::string
+from RAW_SOURCE_HASHED
+where not exists
+    (select 'x'
+     from USERS_TRANSFORMED
+     where USERS_TRANSFORMED.ID = RAW_SOURCE_HASHED.V_SHA);
+
+alter task insert_data resume;
+
+-- Compare results--
+
+select * from USERS_TRANSFORMED;
+
+select * from RAW_SOURCE;
+
+-- Create users view --
+
+create or replace view USERS_VIEW as select FULLNAME, AGE, CITY, ORGANIZATION, DEPARTMENT, SUBDEPARTMENT, TEAM from USERS_TRANSFORMED order by FULLNAME;
+
+select * from USERS_VIEW;
+
+ -- Drop objects --
+
+drop stage if exists azure_stage_sas;
+drop table if exists USERS_TRANSFORMED;
+drop table if exists RAW_SOURCE;
+drop table if exists RAW_SOURCE_HASHED;
+drop task if exists copy_data;
+drop task if exists insert_data;
+drop task if exists generate_sha;
+drop task if exists merge_sources;
+drop view if exists USERS_VIEW;
