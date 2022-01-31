@@ -17,7 +17,6 @@ func transformData(inputStruct datatypes.InputUserData) datatypes.OutputUserData
 		Department:    department,
 		Subdepartment: subdepartment,
 		Team:          team,
-		
 	}
 }
 
@@ -26,7 +25,7 @@ func splitOrganizationString(inputStruct datatypes.InputUserData) (string, strin
 	return splitedInput[0], splitedInput[1], splitedInput[2], splitedInput[3]
 }
 
-func GenerateOutputStruct(newUser datatypes.InputUserData) datatypes.OutputUserData {
+func generateOutputStruct(newUser datatypes.InputUserData) datatypes.OutputUserData {
 	validateInputStruct(newUser)
 	userEntry := transformData(newUser)
 

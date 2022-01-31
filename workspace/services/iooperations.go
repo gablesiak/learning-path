@@ -10,10 +10,9 @@ import (
 )
 
 func GenerateLocalOutput(newUser datatypes.InputUserData) {
-	userEntry := GenerateOutputStruct(newUser)
+	userEntry := generateOutputStruct(newUser)
 	generateLocalFile(userEntry)
 }
-
 
 func generateLocalFile(outputData datatypes.OutputUserData) {
 	multipleOutputData, err := json.MarshalIndent(outputData, "", " ")

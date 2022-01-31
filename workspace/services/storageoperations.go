@@ -57,12 +57,12 @@ func getContainerURL(azureAccess StorageAccess, containerName string) azblob.Con
 	return containerURL
 }
 
-
-func UploadFile(azureAccess StorageAccess, inputData datatypes.InputUserData) {
+func UploadFile(inputData datatypes.InputUserData) {
+	azureAccess := SetStorageAccess()
 	uuidString := uuid.NewString()
 	containerName := "rel-project"
 	containerURL := getContainerURL(azureAccess, containerName)
-	outputData := GenerateOutputStruct(inputData)
+	outputData := generateOutputStruct(inputData)
 
 	multipleOutputData, err := json.MarshalIndent(outputData, "", " ")
 	if err != nil {
