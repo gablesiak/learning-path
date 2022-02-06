@@ -8,10 +8,10 @@ terraform {
 }
 
 provider "snowflake" {
-  username = "${var.snowflake_username}"
-  account  = "${var.snowflake_account}"
+  username = var.snowflake_username
+  account  = var.snowflake_account
   role     = "ACCOUNTADMIN"
-  password = "${var.snowflake_password}"
+  password = var.snowflake_password
 }
 
 resource "snowflake_warehouse" "TEST_WH" {
