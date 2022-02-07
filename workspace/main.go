@@ -34,7 +34,7 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		services.SaveUser(newInput)
+		services.GenerateLocalOutput(newInput)
 		w.WriteHeader(http.StatusCreated)
 		return
 
@@ -45,13 +45,13 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		azureAccess := services.SetStorageAccess()
-		services.UploadFile(azureAccess, newInput)
+		services.UploadFile(newInput)
 		return
+
 	}
 }
 
 func main() {
-	http.HandleFunc("/users", usersHandler)
+	http.HandleFunc("/localupload", usersHandler)
 	http.ListenAndServe(":5000", nil)
 }

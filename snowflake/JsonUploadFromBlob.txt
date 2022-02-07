@@ -1,0 +1,78 @@
+-- SELECT DATABASE --
+use database BLOB_DB;
+
+use schema PUBLIC;
+
+use role accountadmin;
+
+-- Create stage --
+
+create or replace stage azure_stage_sas
+  URL='azure://<storage-account>.blob.core.windows.net/<container>'
+  CREDENTIALS=(AZURE_SAS_TOKEN='<sas-token>');
+
+list @azure_stage_sas;
+
+-- Import raw data to table --
+
+create or replace table RAW_SOURCE (
+  SRC variant, SHA varchar(100));
+
+create or replace task copy_data_from_azure
+warehouse=PLAYWH
+schedule='1 MINUTE'
+AS
+copy into RAW_SOURCE(SRC, SHA)
+from (select $1, SHA2($1) from @azure_stage_sas)
+FILE_FORMAT=(TYPE=json);
+
+alter task copy_data_from_azure resume;
+
+-- Create users table --
+
+create or replace table USERS_TRANSFORMED (SHA varchar(100),FULLNAME varchar(46), AGE number(38,0), CITY varchar(30), ORGANIZATION varchar(30), DEPARTMENT varchar(30), SUBDEPARTMENT varchar(30), TEAM varchar(30));
+
+-- Insert transformed json data to user table --
+
+create or replace task insert_data_into_users_transformed
+warehouse=PLAYWH
+schedule='1 MINUTE'
+AS
+insert into USERS_TRANSFORMED
+select
+SHA,
+src:FULLNAME,
+src:AGE,
+src:CITY,
+src:ORGANIZATION,
+src:DEPARTMENT,
+src:SUBDEPARTMENT,
+src:TEAM
+from RAW_SOURCE
+where not exists
+    (select 'x'
+     from USERS_TRANSFORMED
+     where USERS_TRANSFORMED.SHA = RAW_SOURCE.SHA);
+
+alter task insert_data_into_users_transformed resume;
+
+-- Compare results--
+
+select * from USERS_TRANSFORMED;
+
+select * from RAW_SOURCE;
+
+-- Create users view --
+
+create or replace view USERS_VIEW as select FULLNAME, AGE, CITY, ORGANIZATION, DEPARTMENT, SUBDEPARTMENT, TEAM from USERS_TRANSFORMED order by FULLNAME;
+
+select * from USERS_VIEW;
+
+ -- Drop objects --
+
+drop stage if exists azure_stage_sas;
+drop table if exists USERS_TRANSFORMED;
+drop table if exists RAW_SOURCE;
+drop task if exists copy_data_from_azure;
+drop task if exists insert_data_into_users_transformed;
+drop view if exists USERS_VIEW;

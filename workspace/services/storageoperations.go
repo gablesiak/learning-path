@@ -27,7 +27,7 @@ func SetStorageAccess() StorageAccess {
 	return azureAccess
 }
 
-func CreatePipeline(azureAccess StorageAccess) pipeline.Pipeline {
+func createPipeline(azureAccess StorageAccess) pipeline.Pipeline {
 
 	credential, err := azblob.NewSharedKeyCredential(azureAccess.StorageAccount, azureAccess.AccessKey)
 	if err != nil {
@@ -38,7 +38,7 @@ func CreatePipeline(azureAccess StorageAccess) pipeline.Pipeline {
 	return blobPipeline
 }
 
-func CreateStorageURL(azureAccess StorageAccess, containerName string) *url.URL {
+func createStorageURL(azureAccess StorageAccess, containerName string) *url.URL {
 	URL, err := url.Parse(
 		fmt.Sprintf("https://%s.blob.core.windows.net/%s", azureAccess.StorageAccount, containerName))
 	if err != nil {
@@ -48,30 +48,26 @@ func CreateStorageURL(azureAccess StorageAccess, containerName string) *url.URL 
 	return URL
 }
 
-func GetContainerURL(azureAccess StorageAccess, containerName string) azblob.ContainerURL {
-	blobPipeline := CreatePipeline(azureAccess)
-	URL := CreateStorageURL(azureAccess, containerName)
+func getContainerURL(azureAccess StorageAccess, containerName string) azblob.ContainerURL {
+	blobPipeline := createPipeline(azureAccess)
+	URL := createStorageURL(azureAccess, containerName)
 
 	containerURL := azblob.NewContainerURL(*URL, blobPipeline)
 
 	return containerURL
 }
 
-func CreateContainerName() string {
+func UploadFile(inputData datatypes.InputUserData) {
+	azureAccess := SetStorageAccess()
 	uuidString := uuid.NewString()
-
-	containerName := fmt.Sprintf("c-%s", uuidString)
-
-	return containerName
-}
-
-func UploadFile(stcr StorageAccess, inputData datatypes.InputUserData) {
-	uuidString := uuid.NewString()
-	containerName := CreateContainerName()
-	containerURL := GetContainerURL(stcr, containerName)
-	outputData := GenerateOutputStruct(inputData)
+	containerName := "rel-project"
+	containerURL := getContainerURL(azureAccess, containerName)
+	outputData := generateOutputStruct(inputData)
 
 	multipleOutputData, err := json.MarshalIndent(outputData, "", " ")
+	if err != nil {
+		fmt.Print(err)
+	}
 
 	ctx := context.Background()
 	_, err = containerURL.Create(ctx, azblob.Metadata{}, azblob.PublicAccessNone)
