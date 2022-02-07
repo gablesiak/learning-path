@@ -34,14 +34,24 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		services.SaveUser(newInput)
+		services.GenerateLocalOutput(newInput)
 		w.WriteHeader(http.StatusCreated)
+		return
+
+	case http.MethodPut:
+		newInput, err := services.ValidateRequestBody(r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		services.UploadFile(newInput)
 		return
 
 	}
 }
 
 func main() {
-	http.HandleFunc("/users", usersHandler)
+	http.HandleFunc("/localupload", usersHandler)
 	http.ListenAndServe(":5000", nil)
 }
