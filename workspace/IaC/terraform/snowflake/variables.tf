@@ -1,3 +1,11 @@
+variable "snowflake_database" {
+  default="BLOB_DB"
+}
+
+variable "snowflake_schema"{
+  default="PUBLIC"
+}
+
 variable "az_sas_token" {
   type = string
 }
