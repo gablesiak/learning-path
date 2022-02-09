@@ -1,7 +1,7 @@
 
 resource "snowflake_table" "RAW_SOURCE" {
-  database = snowflake_schema.SCHEMAJSON.database
-  schema   = snowflake_schema.SCHEMAJSON.name
+  database = var.snowflake_database
+  schema   = var.snowflake_schema
   name     = "RAW_SOURCE"
   column {
     name     = "SRC"
@@ -10,7 +10,7 @@ resource "snowflake_table" "RAW_SOURCE" {
   }
 
   column {
-    name     = "V_SHA"
+    name     = "SHA"
     type     = "VARCHAR(100)"
     nullable = false
   }
@@ -18,12 +18,12 @@ resource "snowflake_table" "RAW_SOURCE" {
 
 
 resource "snowflake_table" "USERS_TRANSFORMED" {
-  database = snowflake_schema.SCHEMAJSON.database
-  schema   = snowflake_schema.SCHEMAJSON.name
+  database = var.snowflake_database
+  schema   = var.snowflake_schema
   name     = "USERS_TRANSFORMED"
 
   column {
-    name     = "ID"
+    name     = "SHA"
     type     = "VARCHAR(100)"
     nullable = false
   }

@@ -13,20 +13,3 @@ provider "snowflake" {
   role     = "ACCOUNTADMIN"
   password = var.snowflake_password
 }
-
-resource "snowflake_warehouse" "TEST_WH" {
-  name           = "TEST_WH"
-  warehouse_size = "xsmall"
-}
-
-resource "snowflake_database" "BLOB_DB" {
-  name                        = "BLOB_DB"
-  data_retention_time_in_days = 1
-}
-
-resource "snowflake_schema" "SCHEMAJSON" {
-  name     = "SCHEMAJSON"
-  database = "BLOB_DB"
-}
-
-
