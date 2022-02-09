@@ -4,8 +4,7 @@ resource "snowflake_task" "copy_data_from_azure" {
   schema   = var.snowflake_schema
   warehouse = "TEST_WH"
 
-  database = var.snowflake_database
-  schema   = var.snowflake_schema
+  name          = "copy_data_from_azure"
   sql_statement = "copy into RAW_SOURCE(SRC, SHA) from (select $1, SHA2($1) from @azure_stage_sas)"
 }
 
