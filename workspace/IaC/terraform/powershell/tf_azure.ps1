@@ -1,6 +1,6 @@
 # Connecting to azure
 
-az-login 
+az login 
 
 # Switching to project directory
 
