@@ -1,3 +1,7 @@
+variable "storageAccountName" {
+  default     = "userstransofmr"
+}
+
 variable "replicationType" {
   description = "Type of replication"
   type        = string
