@@ -7,7 +7,7 @@ data "azurerm_resource_group" "ResourceGroup" {
 }
 
 resource "azurerm_storage_account" "StorageAccount" {
-  name                     = "learning"
+  name                     = "learningpathgl"
   resource_group_name      = data.azurerm_resource_group.ResourceGroup.name
   location                 = data.azurerm_resource_group.ResourceGroup.location
   account_kind             = var.accountKind
