@@ -1,0 +1,9 @@
+config:
+  azure-native:location: WestEurope
+ snowflake:account:
+    secure: AAABAPOMshOsf/eAo6Pkl2vYAESCrkaAfesb7pn1EgUI6D3RPp0k
+  snowflake:password:
+    secure: AAABADdu4F7IVdBe+V6ZNBxEwMEA845T9gZlVrqrD9ql1ZYi/dz0rVAtdv+nFk8m6iuZfA==
+  snowflake:region: west-europe.azure
+  snowflake:username:
+    secure: AAABABNAQIN09YMOGSCAndFcBYUWY3cRbYrt2WlsDoW6a7MK/+50
