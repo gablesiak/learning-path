@@ -10,10 +10,6 @@ $env:TF_VAR_snowflake_password = (Get-AzureKeyVaultSecret -VaultName "snowflaked
 $env:TF_VAR_az_sas_token = (Get-AzureKeyVaultSecret -VaultName "snowflakedata" -Name "az-sastoken").secretvaluetext
 $env:TF_VAR_az_container_url= (Get-AzureKeyVaultSecret -VaultName "snowflakedata" -Name "azcontainerurl").secretvaluetext
 
-# Switching to project directory
-
-Set-Location -Path "C:\Users\$env:USERNAME\Desktop\Github\learning-path\workspace\IaC\terraform\snowflake"
-
 # Initializing terraform
 
 terraform init

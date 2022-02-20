@@ -2,10 +2,6 @@
 
 az login 
 
-# Switching to project directory
-
-Set-Location -Path "C:\Users\$env:USERNAME\Desktop\Github\learning-path\workspace\IaC\terraform\azure"
-
 # Initializing terraform
 
 terraform init
